@@ -1,8 +1,7 @@
 ﻿let currentPage = 1;
 let isLoading = false;
 
-// 1. Core function to fetch and render songs
-async function loadMoreSongs(isNewSearch = false) {
+async function loadSongs(isNewSearch = false) {
     if (isLoading) return;
     isLoading = true;
 
@@ -15,87 +14,82 @@ async function loadMoreSongs(isNewSearch = false) {
     const locale = document.getElementById('languageSelect').value;
     const likes = document.getElementById('likesSlider').value;
 
-    try {
-        const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
-        const songs = await response.json();
+    const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
+    const songs = await response.json();
 
-        const tbody = document.getElementById('tableBody');
-        songs.forEach(song => {
-            const row = `<tr>
-                <td>${song.index}</td>
-                <td>${song.title}</td>
-                <td>${song.artist}</td>
-                <td>${song.album}</td>
-                <td>❤️ ${song.likes}</td>
-            </tr>`;
-            tbody.insertAdjacentHTML('beforeend', row);
-        });
+    const tbody = document.getElementById('tableBody');
+    songs.forEach(song => {
+        const tr = document.createElement('tr');
+        tr.className = 'song-row';
+        tr.innerHTML = `
+            <td>${song.index}</td>
+            <td>${song.title}</td>
+            <td>${song.artist}</td>
+            <td>${song.album}</td>
+            <td>${song.genre}</td>
+        `;
 
-        currentPage++;
-    } catch (error) {
-        console.error("Failed to load songs:", error);
-    } finally {
-        isLoading = false;
-    }
+        // Logic to expand the row
+        tr.onclick = () => toggleRow(tr, song);
+
+        tbody.appendChild(tr);
+    });
+
+    currentPage++;
+    isLoading = false;
 }
 
-// 2. Localization Logic: Updates UI text from JSON files
-async function changeLanguage(lang) {
-    try {
-        const response = await fetch(`/Resources/${lang === 'uk' ? 'uk-UA.json' : 'en-US.json'}`);
-        if (!response.ok) throw new Error("Translation file not found");
+function toggleRow(row, song) {
+    const nextRow = row.nextElementSibling;
 
-        const data = await response.json();
-
-        // Update Page Title and Shuffle Button
-        document.title = data.ui.title;
-        document.getElementById('shuffleBtn').innerText = data.ui.shuffle;
-
-        // Update Table Headers
-        const headers = document.querySelectorAll('th');
-        headers[0].innerText = data.ui.table.index;
-        headers[1].innerText = data.ui.table.title;
-        headers[2].innerText = data.ui.table.artist;
-        headers[3].innerText = data.ui.table.album;
-        headers[4].innerText = data.ui.table.likes;
-
-        // Update Labels (Assuming you have labels for these inputs)
-        const labels = document.querySelectorAll('label');
-        labels.forEach(label => {
-            if (label.innerText.toLowerCase().includes('seed')) label.innerText = data.ui.seed;
-            if (label.innerText.toLowerCase().includes('region')) label.innerText = data.ui.region;
-        });
-
-    } catch (error) {
-        console.warn("Localization error:", error);
+    // Close if already open
+    if (nextRow && nextRow.classList.contains('detail-row')) {
+        nextRow.remove();
+        row.classList.remove('active-row');
+        return;
     }
+
+    // Close any other open rows
+    document.querySelectorAll('.detail-row').forEach(r => r.remove());
+    document.querySelectorAll('.active-row').forEach(r => r.classList.remove('active-row'));
+
+    // Create the expanded card
+    row.classList.add('active-row');
+    const detailTr = document.createElement('tr');
+    detailTr.className = 'detail-row';
+    detailTr.innerHTML = `
+        <td colspan="5">
+            <div class="song-card">
+                <div class="album-art-container">
+                    <img src="https://picsum.photos/seed/${song.index}/200" alt="Album Art">
+                    <div style="margin-top:10px; color:#3b82f6;">💙 ${song.likes} Likes</div>
+                </div>
+                <div class="song-details-content">
+                    <h2>${song.title}</h2>
+                    <p>from <strong>${song.album}</strong> by <strong>${song.artist}</strong></p>
+                    <div class="lyrics-box">
+                        <strong>Lyrics:</strong><br>
+                        ${song.lyrics.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            </div>
+        </td>
+    `;
+    row.after(detailTr);
 }
 
-// 3. Event Listeners
-document.getElementById('shuffleBtn').addEventListener('click', () => {
-    const newSeed = Math.floor(Math.random() * 1000000000);
-    document.getElementById('seedInput').value = newSeed;
-    loadMoreSongs(true);
+// Initial Load and Event Listeners
+document.getElementById('seedInput').addEventListener('input', () => loadSongs(true));
+document.getElementById('languageSelect').addEventListener('change', () => loadSongs(true));
+document.getElementById('likesSlider').addEventListener('input', (e) => {
+    document.getElementById('likesValue').innerText = e.target.value;
+    loadSongs(true);
 });
 
-window.onscroll = function () {
+window.onscroll = () => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        loadMoreSongs();
+        loadSongs();
     }
 };
 
-document.getElementById('seedInput').addEventListener('input', () => loadMoreSongs(true));
-
-// Combined Language Change: Update UI Text + Reload Data
-document.getElementById('languageSelect').addEventListener('change', (e) => {
-    changeLanguage(e.target.value); // Fetch JSON strings
-    loadMoreSongs(true);           // Fetch new API data
-});
-
-document.getElementById('likesSlider').addEventListener('input', (e) => {
-    document.getElementById('likesValue').innerText = e.target.value;
-    loadMoreSongs(true);
-});
-
-// Initial load
-loadMoreSongs();
+loadSongs(); // Start the app

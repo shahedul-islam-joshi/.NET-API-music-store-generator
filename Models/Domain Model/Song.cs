@@ -8,5 +8,6 @@
         public string Album { get; set; } = string.Empty;
         public string Genre { get; set; } = string.Empty;
         public int Likes { get; set; }
+        public string Lyrics { get; set; } = string.Empty;
     }
 }

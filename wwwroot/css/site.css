@@ -1,62 +1,85 @@
-/* Toolbar Styling */
-.toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    background-color: #2c3e50;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.control-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-    .control-group input[type="number"],
-    .control-group select {
-        padding: 5px;
-        border-radius: 4px;
-        border: none;
-    }
-
-/* Table Styling */
-main {
-    padding: 20px;
-}
-
-table {
+/* General Table Style */
+#musicTable {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-th {
-    background-color: #f8f9fa;
-    position: sticky;
-    top: 80px;
-    z-index: 10;
-    border-bottom: 2px solid #dee2e6;
-    padding: 12px;
-    text-align: left;
-}
+    #musicTable th {
+        background-color: #f8f9fa;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
 
-td {
-    padding: 12px;
+.song-row {
     border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-tr:hover {
-    background-color: #f1f1f1;
+    .song-row:hover {
+        background-color: #f1f1f1;
+    }
+
+/* The "Selected" row highlight from your image */
+.active-row {
+    background-color: #dbeafe !important;
+    border-left: 4px solid #3b82f6;
 }
 
-.heart {
-    color: #e74c3c;
-    font-weight: bold;
+/* The Expanded Card Area */
+.detail-row td {
+    padding: 0;
+    background-color: #fff;
+}
+
+.song-card {
+    display: flex;
+    padding: 30px;
+    gap: 40px;
+    border-bottom: 1px solid #dee2e6;
+    animation: slideDown 0.3s ease-out;
+}
+
+.album-art-container {
+    flex-shrink: 0;
+}
+
+    .album-art-container img {
+        width: 200px;
+        height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+.song-details-content {
+    flex-grow: 1;
+}
+
+    .song-details-content h2 {
+        margin: 0;
+        font-size: 28px;
+        color: #1a1a1a;
+    }
+
+.lyrics-box {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-style: italic;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
