@@ -1,48 +1,53 @@
 ﻿let currentPage = 1;
-let isLoading = false; // Prevents multiple fetches at once
+let isLoading = false;
 
-// Function to fetch and append data
-async function loadSongs(isNewSearch = false) {
+// 1. Core Fetch Function
+async function fetchSongs(isNewSearch = false) {
     if (isLoading) return;
-    isLoading = true;
-
     if (isNewSearch) {
         currentPage = 1;
         document.getElementById('tableBody').innerHTML = '';
     }
 
+    isLoading = true;
     const seed = document.getElementById('seedInput').value;
     const locale = document.getElementById('languageSelect').value;
     const likes = document.getElementById('likesSlider').value;
 
-    try {
-        const url = `/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`;
-        const response = await fetch(url);
-        const songs = await response.json();
+    const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
+    const songs = await response.json();
 
-        renderSongs(songs);
-        currentPage++; // Prepare for next scroll
-    } catch (e) {
-        console.error("Fetch failed", e);
-    } finally {
-        isLoading = false;
-    }
+    const tbody = document.getElementById('tableBody');
+    songs.forEach(song => {
+        const row = `<tr>
+            <td>${song.index}</td>
+            <td>${song.title}</td>
+            <td>${song.artist}</td>
+            <td>${song.album}</td>
+            <td>❤️ ${song.likes}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
+    });
+
+    currentPage++; // Increment for the next scroll trigger
+    isLoading = false;
 }
 
-// Infinite Scroll Listener
+// 2. Infinite Scroll Listener
 window.onscroll = function () {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        loadSongs(); // Fetch next 10 items
+    // If user is near the bottom of the page
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
+        fetchSongs();
     }
 };
 
-function renderSongs(songs) {
-    const tbody = document.getElementById('tableBody');
-    songs.forEach(song => {
-        const row = `<tr><td>${song.index}</td><td>${song.title}</td><td>${song.artist}</td><td>${song.album}</td><td>❤️ ${song.likes}</td></tr>`;
-        tbody.insertAdjacentHTML('beforeend', row);
-    });
-}
+// 3. Event Listeners for Toolbar
+document.getElementById('seedInput').addEventListener('change', () => fetchSongs(true));
+document.getElementById('languageSelect').addEventListener('change', () => fetchSongs(true));
+document.getElementById('likesSlider').addEventListener('input', (e) => {
+    document.getElementById('likesValue').innerText = e.target.value;
+    fetchSongs(true);
+});
 
-// Initial Call
-loadSongs();
+// Initial Load
+fetchSongs();
