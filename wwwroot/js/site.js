@@ -1,6 +1,7 @@
 ﻿let currentPage = 1;
 let isLoading = false;
 
+// 1. Core function to fetch and render songs
 async function loadMoreSongs(isNewSearch = false) {
     if (isLoading) return;
     isLoading = true;
@@ -30,22 +31,29 @@ async function loadMoreSongs(isNewSearch = false) {
             tbody.insertAdjacentHTML('beforeend', row);
         });
 
-        currentPage++; // Prepare for the next 10 items
+        currentPage++; // Prepare for the next page fetch
     } catch (error) {
-        console.error("Failed to load songs", error);
+        console.error("Failed to load songs:", error);
     } finally {
         isLoading = false;
     }
 }
 
-// Infinite Scroll logic: trigger when user is near bottom
+// 2. Shuffle Button Logic: Generate random seed and reset table
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+    const newSeed = Math.floor(Math.random() * 1000000000);
+    document.getElementById('seedInput').value = newSeed;
+    loadMoreSongs(true);
+});
+
+// 3. Infinite Scroll Listener
 window.onscroll = function () {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
         loadMoreSongs();
     }
 };
 
-// Listeners for UI controls
+// 4. Input listeners for automatic refresh
 document.getElementById('seedInput').addEventListener('input', () => loadMoreSongs(true));
 document.getElementById('languageSelect').addEventListener('change', () => loadMoreSongs(true));
 document.getElementById('likesSlider').addEventListener('input', (e) => {
