@@ -7,26 +7,25 @@ namespace MusicStoreApp.Services
     {
         public List<Song> GenerateSongs(string locale, long userSeed, int pageIndex, double avgLikes)
         {
-            // FIX: Bogus wants "en", not "en-US". This splits the string at the '-'.
-            string cleanedLocale = locale.Contains("-") ? locale.Split('-')[0] : locale;
+            // Fix: Convert 'en-US' or 'uk-UA' to just 'en' or 'uk'
+    string cleanedLocale = locale.Split('-')[0]; 
 
-            var faker = new Faker<Song>(cleanedLocale);
-
-            // Combine seed and page for deterministic results
+    // Now use cleanedLocale instead of locale
+    var faker = new Faker<Song>(cleanedLocale);
             long pageSeed = (userSeed * 6364136223846793005L) + pageIndex;
             faker.UseSeed((int)(pageSeed % int.MaxValue));
 
             faker.RuleFor(s => s.Index, f => (pageIndex * 10) + f.IndexFaker + 1)
-                 .RuleFor(s => s.Title, f => f.Music.Genre() + " " + f.Commerce.ProductName())
+                 .RuleFor(s => s.Title, f => f.Commerce.ProductName())
                  .RuleFor(s => s.Artist, f => f.Name.FullName())
                  .RuleFor(s => s.Album, f => f.Commerce.Color() + " Album")
                  .RuleFor(s => s.Genre, f => f.Music.Genre())
-                 .RuleFor(s => s.Lyrics, f => $"{f.Rant.Review()}\n\n{f.Company.CatchPhrase()}");
+                 // Generates fake lyrics like the image
+                 .RuleFor(s => s.Lyrics, f => $"{f.Hacker.Phrase()}\n{f.Company.CatchPhrase()}\n{f.Hacker.Phrase()}");
 
             var songs = faker.Generate(10).ToList();
-
-            // Probabilistic Likes calculation
             var likeRandom = new Random((int)((userSeed + pageIndex) % int.MaxValue));
+
             foreach (var song in songs)
             {
                 int floorLikes = (int)Math.Floor(avgLikes);

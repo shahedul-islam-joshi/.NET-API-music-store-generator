@@ -15,9 +15,9 @@ body {
     flex-direction: column;
 }
 
-    .toolbar-group.wide {
-        width: 300px;
-    }
+.toolbar-group.wide {
+    width: 300px;
+}
 
 .seed-box {
     display: flex;
@@ -44,9 +44,9 @@ td {
     cursor: pointer;
 }
 
-    .song-row.active {
-        background: #e8f0fe;
-    }
+.song-row.active {
+    background: #e8f0fe;
+}
 
 .chevron {
     width: 20px;
@@ -62,11 +62,11 @@ td {
     padding: 30px;
 }
 
-    .detail-card img {
-        width: 180px;
-        height: 180px;
-        border-radius: 10px;
-    }
+.detail-card img {
+    width: 180px;
+    height: 180px;
+    border-radius: 10px;
+}
 
 .detail-content h2 {
     margin: 0;
@@ -83,12 +83,12 @@ td {
     margin: 15px 0;
 }
 
-    .player .bar {
-        flex: 1;
-        height: 6px;
-        background: #ddd;
-        border-radius: 3px;
-    }
+.player .bar {
+    flex: 1;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+}
 
 .likes {
     display: inline-block;

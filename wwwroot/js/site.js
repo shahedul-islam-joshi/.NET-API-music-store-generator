@@ -1,29 +1,27 @@
 ﻿let currentPage = 1;
-let loading = false;
+let isLoading = false;
 
-async function loadSongs(reset = false) {
-    if (loading) return;
-    loading = true;
+async function loadSongs(isNewSearch = false) {
+    if (isLoading) return;
+    isLoading = true;
 
-    if (reset) {
+    if (isNewSearch) {
         currentPage = 1;
-        document.getElementById("tableBody").innerHTML = "";
+        document.getElementById('tableBody').innerHTML = '';
     }
 
-    const seed = seedInput.value;
-    const locale = languageSelect.value;
-    const likes = likesSlider.value;
+    const seed = document.getElementById('seedInput').value;
+    const locale = document.getElementById('languageSelect').value;
+    const likes = document.getElementById('likesSlider').value;
 
-    const res = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
-    const songs = await res.json();
+    const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
+    const songs = await response.json();
 
-    const tbody = document.getElementById("tableBody");
-
+    const tbody = document.getElementById('tableBody');
     songs.forEach(song => {
-        const tr = document.createElement("tr");
-        tr.className = "song-row";
+        const tr = document.createElement('tr');
+        tr.className = 'song-row';
         tr.innerHTML = `
-            <td class="chevron">▾</td>
             <td>${song.index}</td>
             <td>${song.title}</td>
             <td>${song.artist}</td>
@@ -31,63 +29,67 @@ async function loadSongs(reset = false) {
             <td>${song.genre}</td>
         `;
 
+        // Logic to expand the row
         tr.onclick = () => toggleRow(tr, song);
+        
         tbody.appendChild(tr);
     });
 
     currentPage++;
-    loading = false;
+    isLoading = false;
 }
 
 function toggleRow(row, song) {
-    const next = row.nextElementSibling;
-    if (next && next.classList.contains("detail-row")) {
-        next.remove();
-        row.classList.remove("active");
+    const nextRow = row.nextElementSibling;
+    
+    // Close if already open
+    if (nextRow && nextRow.classList.contains('detail-row')) {
+        nextRow.remove();
+        row.classList.remove('active-row');
         return;
     }
 
-    document.querySelectorAll(".detail-row").forEach(r => r.remove());
-    document.querySelectorAll(".song-row").forEach(r => r.classList.remove("active"));
+    // Close any other open rows
+    document.querySelectorAll('.detail-row').forEach(r => r.remove());
+    document.querySelectorAll('.active-row').forEach(r => r.classList.remove('active-row'));
 
-    row.classList.add("active");
-
-    const detail = document.createElement("tr");
-    detail.className = "detail-row";
-    detail.innerHTML = `
-        <td colspan="6">
-            <div class="detail-card">
-                <img src="https://picsum.photos/seed/${song.index}/180" />
-
-                <div class="detail-content">
+    // Create the expanded card
+    row.classList.add('active-row');
+    const detailTr = document.createElement('tr');
+    detailTr.className = 'detail-row';
+    detailTr.innerHTML = `
+        <td colspan="5">
+            <div class="song-card">
+                <div class="album-art-container">
+                    <img src="https://picsum.photos/seed/${song.index}/200" alt="Album Art">
+                    <div style="margin-top:10px; color:#3b82f6;">💙 ${song.likes} Likes</div>
+                </div>
+                <div class="song-details-content">
                     <h2>${song.title}</h2>
-                    <p class="meta">from <b>${song.album}</b> by <b>${song.artist}</b></p>
-
-                    <div class="player">
-                        ▶ <div class="bar"></div> <span>2:12</span>
-                    </div>
-
-                    <span class="likes">💙 ${song.likes}</span>
-
-                    <div class="lyrics">
-                        <b>Lyrics</b><br/>
-                        ${song.lyrics.replace(/\n/g, "<br/>")}
+                    <p>from <strong>${song.album}</strong> by <strong>${song.artist}</strong></p>
+                    <div class="lyrics-box">
+                        <strong>Lyrics:</strong><br>
+                        ${song.lyrics.replace(/\n/g, '<br>')}
                     </div>
                 </div>
             </div>
         </td>
     `;
-    row.after(detail);
+    row.after(detailTr);
 }
 
-seedInput.oninput = () => loadSongs(true);
-languageSelect.onchange = () => loadSongs(true);
-likesSlider.oninput = () => loadSongs(true);
+// Initial Load and Event Listeners
+document.getElementById('seedInput').addEventListener('input', () => loadSongs(true));
+document.getElementById('languageSelect').addEventListener('change', () => loadSongs(true));
+document.getElementById('likesSlider').addEventListener('input', (e) => {
+    document.getElementById('likesValue').innerText = e.target.value;
+    loadSongs(true);
+});
 
 window.onscroll = () => {
-    if (window.innerHeight + window.scrollY > document.body.offsetHeight - 200) {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
         loadSongs();
     }
 };
 
-loadSongs();
+loadSongs(); // Start the app
