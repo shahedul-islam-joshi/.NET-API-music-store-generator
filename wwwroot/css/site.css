@@ -1,85 +1,104 @@
-/* General Table Style */
-#musicTable {
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI";
+    background: #fff;
+}
+
+.toolbar {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.toolbar-group {
+    display: flex;
+    flex-direction: column;
+}
+
+    .toolbar-group.wide {
+        width: 300px;
+    }
+
+.seed-box {
+    display: flex;
+    gap: 5px;
+}
+
+table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-    #musicTable th {
-        background-color: #f8f9fa;
-        padding: 15px;
-        text-align: left;
-        border-bottom: 2px solid #dee2e6;
-    }
+th {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #eee;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
 
 .song-row {
-    border-bottom: 1px solid #eee;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
-    .song-row:hover {
-        background-color: #f1f1f1;
+    .song-row.active {
+        background: #e8f0fe;
     }
 
-/* The "Selected" row highlight from your image */
-.active-row {
-    background-color: #dbeafe !important;
-    border-left: 4px solid #3b82f6;
+.chevron {
+    width: 20px;
 }
 
-/* The Expanded Card Area */
 .detail-row td {
     padding: 0;
-    background-color: #fff;
 }
 
-.song-card {
+.detail-card {
     display: flex;
+    gap: 30px;
     padding: 30px;
-    gap: 40px;
-    border-bottom: 1px solid #dee2e6;
-    animation: slideDown 0.3s ease-out;
 }
 
-.album-art-container {
-    flex-shrink: 0;
-}
-
-    .album-art-container img {
-        width: 200px;
-        height: 200px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    .detail-card img {
+        width: 180px;
+        height: 180px;
+        border-radius: 10px;
     }
 
-.song-details-content {
-    flex-grow: 1;
+.detail-content h2 {
+    margin: 0;
 }
 
-    .song-details-content h2 {
-        margin: 0;
-        font-size: 28px;
-        color: #1a1a1a;
+.meta {
+    color: #666;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+    .player .bar {
+        flex: 1;
+        height: 6px;
+        background: #ddd;
+        border-radius: 3px;
     }
 
-.lyrics-box {
-    margin-top: 20px;
-    padding-top: 20px;
+.likes {
+    display: inline-block;
+    margin-bottom: 15px;
+    color: #2563eb;
+}
+
+.lyrics {
     border-top: 1px solid #eee;
+    padding-top: 15px;
+    color: #444;
     font-style: italic;
-    color: #4b5563;
-    line-height: 1.6;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
