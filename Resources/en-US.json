@@ -1,0 +1,16 @@
+{
+  "ui": {
+    "title": "Music Store Generator",
+    "region": "Region",
+    "seed": "Seed",
+    "likes": "Avg Likes",
+    "shuffle": "Randomize",
+    "table": {
+      "index": "#",
+      "title": "Song Title",
+      "artist": "Artist",
+      "album": "Album",
+      "likes": "Likes"
+    }
+  }
+}
