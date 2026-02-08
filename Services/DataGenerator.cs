@@ -8,30 +8,28 @@ namespace MusicStoreApp.Services
 {
     public class DataGenerator
     {
+        // This is the method the Controller is looking for!
         public List<Song> GenerateSongs(string locale, long userSeed, int pageIndex, double avgLikes)
         {
-            // 1. MAD Operation
-            long combinedSeed = (userSeed * 6364136223846793005L) + pageIndex;
-
-            // 2. Initialize the Faker with the specific locale
-            // If the locale (like 'uk') fails, Bogus defaults to 'en'
+            // 1. Set the locale (e.g., "en", "de", "uk")
             var faker = new Faker<Song>(locale);
 
-            // 3. APPLY THE SEED
-            // We cast the 64-bit seed to 32-bit int for the RNG
-            faker.UseSeed((int)(combinedSeed % int.MaxValue));
+            // 2. The MAD Operation for reproducibility
+            // We combine the seed and page number to get a unique seed for this specific page
+            long pageSeed = (userSeed * 6364136223846793005L) + pageIndex;
+            faker.UseSeed((int)(pageSeed % int.MaxValue));
 
-            // 4. DEFINE RULES (Fixed syntax for standard Bogus)
+            // 3. Define the rules for generating fake song data
             faker.RuleFor(s => s.Index, f => (pageIndex * 10) + f.IndexFaker + 1)
                  .RuleFor(s => s.Title, f => f.Commerce.ProductName())
-                 .RuleFor(s => s.Artist, f => f.Name.FullName()) // Standard Name dataset
+                 .RuleFor(s => s.Artist, f => f.Name.FullName())
                  .RuleFor(s => s.Album, f => f.Commerce.Color() + " Album")
-                 .RuleFor(s => s.Genre, f => f.Music.Genre()); // Standard Music dataset
+                 .RuleFor(s => s.Genre, f => f.Music.Genre());
 
-            // 5. GENERATE & CONVERT
+            // 4. Generate 10 songs and convert to a List
             var songs = faker.Generate(10).ToList();
 
-            // 6. PROBABILISTIC LIKES
+            // 5. Probabilistic Likes Logic
             var likeRandom = new Random((int)((userSeed + pageIndex) % int.MaxValue));
             foreach (var song in songs)
             {

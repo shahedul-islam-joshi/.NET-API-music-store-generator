@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MusicStoreApp.Models;
 using MusicStoreApp.Services;
+using MusicStoreApp.Models;
 
 namespace MusicStoreApp.Controllers
 {
@@ -8,30 +8,14 @@ namespace MusicStoreApp.Controllers
     [Route("api/[controller]")]
     public class MusicController : ControllerBase
     {
-        private readonly DataGenerator _generator;
-
-        public MusicController()
-        {
-            // Simple instantiation for now to keep it "stupid simple"
-            _generator = new DataGenerator();
-        }
+        private readonly DataGenerator _generator = new DataGenerator();
 
         [HttpGet]
-        public IActionResult GetSongs(
-            [FromQuery] string locale = "en",
-            [FromQuery] long seed = 0,
-            [FromQuery] int page = 1,
-            [FromQuery] double likes = 0)
+        public IActionResult GetSongs(string locale = "en", long seed = 0, int page = 1, double likes = 0)
         {
-            try
-            {
-                var songs = _generator.GenerateSongs(locale, seed, page, likes);
-                return Ok(songs);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            // The service uses these parameters to generate the next 10 items
+            var songs = _generator.GenerateSongs(locale, seed, page, likes);
+            return Ok(songs);
         }
     }
 }
