@@ -1,35 +1,45 @@
-﻿<div class="toolbar">
+﻿@{
+    ViewData["Title"] = "Music Store Generator";
+}
+
+<div class="toolbar">
     <div class="control-group">
         <label>Region:</label>
-        <select id="languageSelect">
+        <select id="languageSelect" class="form-control">
             <option value="en-US">USA (English)</option>
             <option value="uk-UA">Ukraine (Ukrainian)</option>
+            <option value="de-DE">Germany (German)</option>
         </select>
     </div>
 
     <div class="control-group">
         <label>Seed:</label>
-        <input type="number" id="seedInput" value="12345">
-        <button id="shuffleBtn" class="btn btn-light">Randomize</button>
+        <input type="number" id="seedInput" value="12345" class="form-control" style="width: 100px;">
+        <button id="shuffleBtn" class="btn btn-primary">Randomize</button>
     </div>
 
-    <div class="control-group">
-        <label>Avg Likes:</label>
-        <input type="range" id="likesSlider" min="0" max="10" step="0.1" value="0">
-        <span id="likesValue">0</span>
+    <div class="control-group" style="flex-grow: 1;">
+        <label>Avg Likes: <span id="likesValue" style="font-weight:bold; color:#007bff;">0</span></label>
+        <input type="range" id="likesSlider" min="0" max="10" step="0.1" value="0" style="width: 100%;">
     </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Song Title</th>
-            <th>Artist</th>
-            <th>Album</th>
-            <th>Likes</th>
-        </tr>
-    </thead>
-    <tbody id="tableBody">
-    </tbody>
-</table>
+<div class="container-fluid">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="width: 50px;">#</th>
+                <th>Song Title</th>
+                <th>Artist</th>
+                <th>Album</th>
+                <th>Likes</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
+
+    <div id="loading" style="text-align:center; display:none; padding:20px;">
+        <span>Loading more songs...</span>
+    </div>
+</div>

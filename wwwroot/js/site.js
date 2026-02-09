@@ -1,17 +1,18 @@
 ﻿let currentPage = 1;
 let isLoading = false;
-let currentAudio = null;
 
+// 1. Main Function to Fetch Data
 async function loadMoreSongs(isNewSearch = false) {
     if (isLoading) return;
     isLoading = true;
+    document.getElementById('loading').style.display = 'block';
 
     if (isNewSearch) {
         currentPage = 1;
         document.getElementById('tableBody').innerHTML = '';
     }
 
-    const seed = document.getElementById('seedInput').value || 123;
+    const seed = document.getElementById('seedInput').value || 0;
     const locale = document.getElementById('languageSelect').value;
     const likes = document.getElementById('likesSlider').value;
 
@@ -22,91 +23,83 @@ async function loadMoreSongs(isNewSearch = false) {
         const tbody = document.getElementById('tableBody');
 
         songs.forEach(song => {
-            // 1. Generate a consistent Album Art URL based on seed + index
+            // Generate consistent Album Art
             const artUrl = `https://picsum.photos/seed/${song.index + seed}/200`;
 
-            // 2. The Main Row (Visible)
-            // Note: We add 'onclick="toggleDetails(...)"' to handle the expand logic
+            // Main Row (Visible)
             const mainRow = `
             <tr class="song-row" onclick="toggleDetails(${song.index})">
-                <td>
-                    <span id="arrow-${song.index}">&#9654;</span> ${song.index}
-                </td>
-                <td>
-                    <strong>${song.title}</strong>
-                </td>
+                <td><span id="arrow-${song.index}">&#9654;</span> ${song.index}</td>
+                <td><strong>${song.title}</strong></td>
                 <td>${song.artist}</td>
                 <td>${song.album}</td>
-                <td style="color: #e74c3c;">❤️ ${song.likes}</td>
+                <td style="color:#e74c3c; font-weight:bold;">❤️ ${song.likes}</td>
             </tr>`;
 
-            // 3. The Detail Row (Hidden by default)
-            // This contains the Album Art, Audio Player, and Lyrics
+            // Detail Row (Hidden)
             const detailRow = `
             <tr id="detail-${song.index}" class="detail-row" style="display: none;">
                 <td colspan="5">
                     <div class="detail-content">
                         <img src="${artUrl}" class="album-art" alt="Album Art">
-                        
                         <div class="track-info">
-                            <h3>${song.title} <small class="text-muted">by ${song.artist}</small></h3>
+                            <h4>${song.title} <small class="text-muted">by ${song.artist}</small></h4>
                             
-                            <audio controls>
+                            <audio controls style="width: 100%; margin: 10px 0;">
                                 <source src="${song.audioUrl}" type="audio/mpeg">
-                                Your browser does not support the audio element.
                             </audio>
 
                             <div class="lyrics-box">
                                 <strong>Lyrics:</strong><br/>
-                                ${song.lyrics.replace(/\n/g, '<br/>')}
+                                <em>${song.lyrics.replace(/\n/g, '<br/>')}</em>
                             </div>
                         </div>
                     </div>
                 </td>
             </tr>`;
 
-            // Append BOTH rows to the table
             tbody.insertAdjacentHTML('beforeend', mainRow + detailRow);
         });
 
         currentPage++;
     } catch (error) {
-        console.error("Error loading songs:", error);
+        console.error("Error:", error);
     } finally {
         isLoading = false;
+        document.getElementById('loading').style.display = 'none';
     }
 }
 
-// --- NEW FUNCTION: Handles the Expand/Collapse logic ---
+// 2. Expand/Collapse Function
 function toggleDetails(index) {
-    const detailRow = document.getElementById(`detail-${index}`);
+    const row = document.getElementById(`detail-${index}`);
     const arrow = document.getElementById(`arrow-${index}`);
 
-    if (detailRow.style.display === "none") {
-        detailRow.style.display = "table-row"; // Show it
-        arrow.innerHTML = "&#9660;"; // Change arrow to Down
+    if (row.style.display === "none") {
+        row.style.display = "table-row";
+        arrow.innerHTML = "&#9660;"; // Down Arrow
     } else {
-        detailRow.style.display = "none"; // Hide it
-        arrow.innerHTML = "&#9654;"; // Change arrow to Right
+        row.style.display = "none";
+        arrow.innerHTML = "&#9654;"; // Right Arrow
     }
 }
 
-// --- EVENT LISTENERS (Same as before) ---
+// 3. Event Listeners
+document.getElementById('likesSlider').addEventListener('input', (e) => {
+    document.getElementById('likesValue').innerText = e.target.value;
+    loadMoreSongs(true); // REFRESH TABLE ON SLIDER CHANGE
+});
+
+document.getElementById('seedInput').addEventListener('input', () => loadMoreSongs(true));
+document.getElementById('languageSelect').addEventListener('change', () => loadMoreSongs(true));
 document.getElementById('shuffleBtn').addEventListener('click', () => {
     document.getElementById('seedInput').value = Math.floor(Math.random() * 1000000);
     loadMoreSongs(true);
 });
 
-document.getElementById('likesSlider').addEventListener('input', (e) => {
-    document.getElementById('likesValue').innerText = e.target.value;
-    loadMoreSongs(true); // Recalculate likes immediately
-});
-
-document.getElementById('seedInput').addEventListener('input', () => loadMoreSongs(true));
-document.getElementById('languageSelect').addEventListener('change', () => loadMoreSongs(true));
-
+// 4. Infinite Scroll
 window.onscroll = function () {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
         loadMoreSongs();
     }
 };

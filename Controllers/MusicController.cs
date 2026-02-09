@@ -8,7 +8,7 @@ namespace MusicStoreApp.Controllers
     public class MusicController : ControllerBase
     {
         [HttpGet]
-        public IActionResult GetMusic(string locale = "en", long seed = 1, int page = 1, double likes = 0)
+        public IActionResult GetMusic(string locale = "en", long seed = 123, int page = 1, double likes = 0)
         {
             var generator = new DataGenerator();
             var songs = generator.GenerateSongs(locale, seed, page, likes);
