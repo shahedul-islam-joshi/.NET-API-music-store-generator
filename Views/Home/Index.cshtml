@@ -1,16 +1,16 @@
 ﻿<div class="toolbar">
     <div class="control-group">
-        <label>Language:</label>
+        <label>Region:</label>
         <select id="languageSelect">
-            <option value="en-US">English (US)</option>
-            <option value="uk-UA">Ukrainian</option>
+            <option value="en-US">USA (English)</option>
+            <option value="uk-UA">Ukraine (Ukrainian)</option>
         </select>
     </div>
 
     <div class="control-group">
         <label>Seed:</label>
-        <input type="number" id="seedInput" value="58933423">
-        <button id="shuffleBtn">🔀</button>
+        <input type="number" id="seedInput" value="12345">
+        <button id="shuffleBtn" class="btn btn-light">Randomize</button>
     </div>
 
     <div class="control-group">
@@ -20,18 +20,16 @@
     </div>
 </div>
 
-<main>
-    <table id="musicTable">
-        <thead>
-            <tr id="tableHeader">
-                <th>#</th>
-                <th>Song</th>
-                <th>Artist</th>
-                <th>Album</th>
-                <th>Genre</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-    </table>
-</main>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Song Title</th>
+            <th>Artist</th>
+            <th>Album</th>
+            <th>Likes</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+    </tbody>
+</table>

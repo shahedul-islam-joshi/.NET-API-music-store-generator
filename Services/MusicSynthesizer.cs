@@ -2,18 +2,14 @@
 {
     public class MusicSynthesizer
     {
-        // Generates a deterministic "Audio Fingerprint" based on song metadata
-        public string GenerateAudioMetadata(string genre, string title, int seed)
+        public string GenerateAudioUrl(string genre, int seed)
         {
-            // This simulates linking the fake data to a synthetic audio engine
-            return $"SYNTH-{genre.ToUpper()}-{seed}-{title.GetHashCode():X}";
-        }
+            // Using a procedural audio service (like a placeholder synth engine)
+            // The 'seed' ensures the same music plays for the same song every time.
+            string instrument = (seed % 3 == 0) ? "piano" : (seed % 3 == 1) ? "guitar" : "synth";
 
-        // Returns a placeholder duration or BPM for the song
-        public int GetBpm(int seed)
-        {
-            var rng = new Random(seed);
-            return rng.Next(60, 180); // Standard musical BPM range
+            // This returns a URL to a procedural audio generator or a specific seeded track
+            return $"https://your-audio-engine.com/play?genre={genre}&seed={seed}&instrument={instrument}";
         }
     }
 }

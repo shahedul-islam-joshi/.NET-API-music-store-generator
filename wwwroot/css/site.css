@@ -1,3 +1,59 @@
+
+/* Add this to the bottom of your existing CSS */
+
+/* The row you click on */
+.song-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .song-row:hover {
+        background-color: #f1f1f1;
+    }
+
+/* The hidden detail row */
+.detail-row {
+    background-color: #f8f9fa; /* Light gray background */
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* The container inside the detail row */
+.detail-content {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+/* Album Art */
+.album-art {
+    width: 150px;
+    height: 150px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    object-fit: cover;
+}
+
+/* Info and Player area */
+.track-info {
+    flex-grow: 1;
+}
+
+.lyrics-box {
+    margin-top: 15px;
+    font-style: italic;
+    color: #555;
+    background: white;
+    padding: 10px;
+    border-left: 4px solid #007bff; /* Blue accent line */
+    border-radius: 4px;
+}
+
+/* Custom Audio Player styling */
+audio {
+    width: 100%;
+    margin-top: 10px;
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI";
     background: #fff;

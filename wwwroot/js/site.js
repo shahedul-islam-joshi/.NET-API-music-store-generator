@@ -1,7 +1,8 @@
 ﻿let currentPage = 1;
 let isLoading = false;
+let currentAudio = null;
 
-async function loadSongs(isNewSearch = false) {
+async function loadMoreSongs(isNewSearch = false) {
     if (isLoading) return;
     isLoading = true;
 
@@ -10,86 +11,105 @@ async function loadSongs(isNewSearch = false) {
         document.getElementById('tableBody').innerHTML = '';
     }
 
-    const seed = document.getElementById('seedInput').value;
+    const seed = document.getElementById('seedInput').value || 123;
     const locale = document.getElementById('languageSelect').value;
     const likes = document.getElementById('likesSlider').value;
 
-    const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
-    const songs = await response.json();
+    try {
+        const response = await fetch(`/api/music?seed=${seed}&page=${currentPage}&locale=${locale}&likes=${likes}`);
+        const songs = await response.json();
 
-    const tbody = document.getElementById('tableBody');
-    songs.forEach(song => {
-        const tr = document.createElement('tr');
-        tr.className = 'song-row';
-        tr.innerHTML = `
-            <td>${song.index}</td>
-            <td>${song.title}</td>
-            <td>${song.artist}</td>
-            <td>${song.album}</td>
-            <td>${song.genre}</td>
-        `;
+        const tbody = document.getElementById('tableBody');
 
-        // Logic to expand the row
-        tr.onclick = () => toggleRow(tr, song);
-        
-        tbody.appendChild(tr);
-    });
+        songs.forEach(song => {
+            // 1. Generate a consistent Album Art URL based on seed + index
+            const artUrl = `https://picsum.photos/seed/${song.index + seed}/200`;
 
-    currentPage++;
-    isLoading = false;
-}
+            // 2. The Main Row (Visible)
+            // Note: We add 'onclick="toggleDetails(...)"' to handle the expand logic
+            const mainRow = `
+            <tr class="song-row" onclick="toggleDetails(${song.index})">
+                <td>
+                    <span id="arrow-${song.index}">&#9654;</span> ${song.index}
+                </td>
+                <td>
+                    <strong>${song.title}</strong>
+                </td>
+                <td>${song.artist}</td>
+                <td>${song.album}</td>
+                <td style="color: #e74c3c;">❤️ ${song.likes}</td>
+            </tr>`;
 
-function toggleRow(row, song) {
-    const nextRow = row.nextElementSibling;
-    
-    // Close if already open
-    if (nextRow && nextRow.classList.contains('detail-row')) {
-        nextRow.remove();
-        row.classList.remove('active-row');
-        return;
-    }
+            // 3. The Detail Row (Hidden by default)
+            // This contains the Album Art, Audio Player, and Lyrics
+            const detailRow = `
+            <tr id="detail-${song.index}" class="detail-row" style="display: none;">
+                <td colspan="5">
+                    <div class="detail-content">
+                        <img src="${artUrl}" class="album-art" alt="Album Art">
+                        
+                        <div class="track-info">
+                            <h3>${song.title} <small class="text-muted">by ${song.artist}</small></h3>
+                            
+                            <audio controls>
+                                <source src="${song.audioUrl}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
 
-    // Close any other open rows
-    document.querySelectorAll('.detail-row').forEach(r => r.remove());
-    document.querySelectorAll('.active-row').forEach(r => r.classList.remove('active-row'));
-
-    // Create the expanded card
-    row.classList.add('active-row');
-    const detailTr = document.createElement('tr');
-    detailTr.className = 'detail-row';
-    detailTr.innerHTML = `
-        <td colspan="5">
-            <div class="song-card">
-                <div class="album-art-container">
-                    <img src="https://picsum.photos/seed/${song.index}/200" alt="Album Art">
-                    <div style="margin-top:10px; color:#3b82f6;">💙 ${song.likes} Likes</div>
-                </div>
-                <div class="song-details-content">
-                    <h2>${song.title}</h2>
-                    <p>from <strong>${song.album}</strong> by <strong>${song.artist}</strong></p>
-                    <div class="lyrics-box">
-                        <strong>Lyrics:</strong><br>
-                        ${song.lyrics.replace(/\n/g, '<br>')}
+                            <div class="lyrics-box">
+                                <strong>Lyrics:</strong><br/>
+                                ${song.lyrics.replace(/\n/g, '<br/>')}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </td>
-    `;
-    row.after(detailTr);
+                </td>
+            </tr>`;
+
+            // Append BOTH rows to the table
+            tbody.insertAdjacentHTML('beforeend', mainRow + detailRow);
+        });
+
+        currentPage++;
+    } catch (error) {
+        console.error("Error loading songs:", error);
+    } finally {
+        isLoading = false;
+    }
 }
 
-// Initial Load and Event Listeners
-document.getElementById('seedInput').addEventListener('input', () => loadSongs(true));
-document.getElementById('languageSelect').addEventListener('change', () => loadSongs(true));
-document.getElementById('likesSlider').addEventListener('input', (e) => {
-    document.getElementById('likesValue').innerText = e.target.value;
-    loadSongs(true);
+// --- NEW FUNCTION: Handles the Expand/Collapse logic ---
+function toggleDetails(index) {
+    const detailRow = document.getElementById(`detail-${index}`);
+    const arrow = document.getElementById(`arrow-${index}`);
+
+    if (detailRow.style.display === "none") {
+        detailRow.style.display = "table-row"; // Show it
+        arrow.innerHTML = "&#9660;"; // Change arrow to Down
+    } else {
+        detailRow.style.display = "none"; // Hide it
+        arrow.innerHTML = "&#9654;"; // Change arrow to Right
+    }
+}
+
+// --- EVENT LISTENERS (Same as before) ---
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+    document.getElementById('seedInput').value = Math.floor(Math.random() * 1000000);
+    loadMoreSongs(true);
 });
 
-window.onscroll = () => {
+document.getElementById('likesSlider').addEventListener('input', (e) => {
+    document.getElementById('likesValue').innerText = e.target.value;
+    loadMoreSongs(true); // Recalculate likes immediately
+});
+
+document.getElementById('seedInput').addEventListener('input', () => loadMoreSongs(true));
+document.getElementById('languageSelect').addEventListener('change', () => loadMoreSongs(true));
+
+window.onscroll = function () {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        loadSongs();
+        loadMoreSongs();
     }
 };
 
-loadSongs(); // Start the app
+// Initial Load
+loadMoreSongs();
